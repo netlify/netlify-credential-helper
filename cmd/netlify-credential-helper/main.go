@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	credentials.Serve(netlify.NetlifyCredentials{})
+	credentials.Serve(netlify.NewNetlifyCredentials())
 }
