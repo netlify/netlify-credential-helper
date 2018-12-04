@@ -1,4 +1,11 @@
-.PHONY: all build deps image release test
+.PHONY: all build_linux build_macosx build_windows clean clean_release deps package_linux package_macosx package_windows release test
+
+define build
+	@echo "Building git-credential-netlify for $(os)/$(arch)"
+	@mkdir -p builds/$(os)-${TAG}
+	@GO111MODULE=on CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -ldflags "-X github.com/netlify/netlify-credential-helper/credentials.Version=${TAG} -X github.com/netlify/netlify-credential-helper/credentials.SHA=`git rev-parse HEAD`" -o builds/$(os)-${TAG}/git-credential-netlify cmd/netlify-credential-helper/main.go
+	@echo "Built: builds/$(os)-${TAG}/git-credential-netlify"
+endef
 
 help: ## Show this help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -10,17 +17,17 @@ os = linux
 arch = amd64
 TAG = development
 
-build:
-	@echo "Building git-credential-netlify for $(os)/$(arch)"
-	@mkdir -p builds/$(os)-${TAG}
-	@GO111MODULE=on CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -ldflags "-X github.com/netlify/netlify-credential-helper/credentials.Version=${TAG} -X github.com/netlify/netlify-credential-helper/credentials.SHA=`git rev-parse HEAD`" -o builds/$(os)-${TAG}/git-credential-netlify cmd/netlify-credential-helper/main.go
-	@echo "Built: builds/$(os)-${TAG}/git-credential-netlify"
+build_linux: override os=linux
+build_linux: ## Build the binary for Linux.
+	$(call build)
 
-build_linux: override os=linux ## Build the binary for Linux hosts.
-build_linux: build
+build_macosx: override os=darwin
+build_macosx: ## Build the binary for Mac OS X.
+	$(call build)
 
-build_windows: override os=windows ## Build the binary for Windows hosts.
-build_windows: build
+build_windows: override os=windows
+build_windows: ## Build the binary for Windows.
+	$(call build)
 
 clean: ## Remove all artifacts.
 	@rm -rf builds releases
@@ -33,17 +40,15 @@ deps: ## Install dependencies.
 	@echo "Installing dependencies"
 	@GO111MODULE=on go mod verify
 
-package: build clean_release ## Build a release package with the default flags.
+package_linux: override os=linux
+package_linux: build_linux clean_release ## Build a release package for Linux.
 	@tar -czf releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.tar.gz -C builds/$(os)-${TAG} $(binary)
 
-package_linux: override os=linux ## Build a release package for Linux.
-package_linux: package
+package_macosx: override os=darwin
+package_macosx: build_macosx clean_release ## Build a release package for Mac OS X.
+	@tar -czf releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.tar.gz -C builds/$(os)-${TAG} $(binary)
 
-package_macosx: override os=darwin ## Build a release package for Mac OS X.
-package_macosx: package
-
-package_windows: override os=darwin ## Build a release package for Windows.
-package_windows: build clean_release
+package_windows: build_windows clean_release ## Build a release package for Windows.
 	@zip -j releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.zip builds/$(os)-${TAG}/$(binary)
 
 release: package_linux package_macosx package_windows ## Create a GitHub release and upload packages.
