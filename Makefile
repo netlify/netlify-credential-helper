@@ -48,6 +48,7 @@ package_macosx: override os=darwin
 package_macosx: build_macosx clean_release ## Build a release package for Mac OS X.
 	@tar -czf releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.tar.gz -C builds/$(os)-${TAG} $(binary)
 
+package_windows: override os=windows
 package_windows: build_windows clean_release ## Build a release package for Windows.
 	@zip -j releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.zip builds/$(os)-${TAG}/$(binary)
 
