@@ -9,16 +9,19 @@ import (
 )
 
 const (
-	netlifyEnvAccessToken  = "NETLIFY_ACCESS_TOKEN"
-	netlifyEnvClientID     = "NETLIFY_CLIENT_ID"
-	netlifyServerName      = "https://api.netlify.com"
-	netlifyAccessTokenUser = "access-token"
-	netlifyDefaultClientID = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
-	netlifyApiPath         = "/api/v1"
+	netlifyEnvAccessToken       = "NETLIFY_ACCESS_TOKEN"
+	netlifyEnvClientID          = "NETLIFY_CLIENT_ID"
+	netlifyServerName           = "https://api.netlify.com"
+	netlifyAccessTokenUser      = "access-token"
+	netlifyDefaultClientID      = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
+	netlifyApiPath              = "/api/v1"
+	netlifyLfsPath              = "/.netlify/lfs"
+	netlifyLargeMediaCapability = "large_media"
 
 	gitHostKey     = "host"
 	gitUsernameKey = "username"
 	gitPasswordKey = "password"
+	gitPathKey     = "path"
 )
 
 var (
@@ -81,6 +84,10 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 		return fmt.Errorf("Missing host to check credentials: %s", buffer.String())
 	}
 
+	if path, exist := data[gitPathKey]; !exist || path != netlifyLfsPath {
+		return fmt.Errorf("Invalid LFS path: %s", buffer.String())
+	}
+
 	accessToken, err := getAccessToken(host)
 	if err != nil {
 		return err
@@ -104,12 +111,11 @@ func printVersion(out io.Writer) error {
 }
 
 func getAccessToken(host string) (string, error) {
-	accessToken := os.Getenv(netlifyEnvAccessToken)
-	if accessToken != "" {
-		return accessToken, nil
+	accessToken, err := loadAccessToken(host)
+	if err != nil {
+		return "", err
 	}
 
-	accessToken = loadAccessToken(host)
 	if accessToken != "" {
 		return accessToken, nil
 	}
@@ -119,9 +125,10 @@ func getAccessToken(host string) (string, error) {
 		clientID = netlifyDefaultClientID
 	}
 
-	accessToken, err := login(clientID)
+	accessToken, err = login(clientID, host)
 	if err != nil {
 		return "", err
 	}
+
 	return accessToken, nil
 }

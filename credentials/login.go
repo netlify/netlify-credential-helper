@@ -1,8 +1,11 @@
 package credentials
 
 import (
+	"os"
+
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	isatty "github.com/mattn/go-isatty"
 	"github.com/netlify/open-api/go/models"
 	"github.com/skratchdot/open-golang/open"
 )
@@ -15,7 +18,12 @@ const (
 
 var apiSchemes = []string{netlifyApiScheme}
 
-func login(clientID string) (string, error) {
+func login(clientID, host string) (string, error) {
+	if !isTTY() {
+		// do not try to login when the standard input is not a TTY.
+		return "", nil
+	}
+
 	client, ctx := newNetlifyApiClient(noCredentials)
 	ticket, err := client.CreateTicket(ctx, clientID)
 	if err != nil {
@@ -44,6 +52,10 @@ func login(clientID string) (string, error) {
 		return "", err
 	}
 
+	if err := tryAccessToken(host, token.AccessToken); err != nil {
+		return "", err
+	}
+
 	return token.AccessToken, nil
 }
 
@@ -54,4 +66,8 @@ func openAuthUI(ticket *models.Ticket) error {
 func noCredentials(r runtime.ClientRequest, _ strfmt.Registry) error {
 	r.SetHeaderParam("User-Agent", "git-credential-netlify")
 	return nil
+}
+
+func isTTY() bool {
+	return isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
 }
