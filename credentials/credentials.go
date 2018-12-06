@@ -15,6 +15,7 @@ const (
 	netlifyAccessTokenUser = "access-token"
 	netlifyDefaultClientID = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
 
+	gitHostKey     = "host"
 	gitUsernameKey = "username"
 	gitPasswordKey = "password"
 )
@@ -74,7 +75,12 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 		return err
 	}
 
-	accessToken, err := getAccessToken()
+	host, exist := data[gitHostKey]
+	if !exist {
+		return fmt.Errorf("Missing host to check credentials: %s", buffer.String())
+	}
+
+	accessToken, err := getAccessToken(host)
 	if err != nil {
 		return err
 	}
@@ -96,13 +102,13 @@ func printVersion(out io.Writer) error {
 	return err
 }
 
-func getAccessToken() (string, error) {
+func getAccessToken(host string) (string, error) {
 	accessToken := os.Getenv(netlifyEnvAccessToken)
 	if accessToken != "" {
 		return accessToken, nil
 	}
 
-	accessToken = loadAccessToken()
+	accessToken = loadAccessToken(host)
 	if accessToken != "" {
 		return accessToken, nil
 	}
