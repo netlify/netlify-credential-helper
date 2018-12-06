@@ -9,6 +9,7 @@ import (
 )
 
 var validAuthPaths = [][]string{
+	{".config", "netlify.json"},
 	{".config", "netlify"},
 	{".netlify", "config"},
 }
