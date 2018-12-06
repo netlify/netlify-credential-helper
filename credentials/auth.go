@@ -3,6 +3,7 @@ package credentials
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -13,6 +14,8 @@ import (
 	"github.com/netlify/open-api/go/porcelain"
 	apiContext "github.com/netlify/open-api/go/porcelain/context"
 )
+
+type netlifyHostAccessCheck func(host, token string) error
 
 type netlifyAuthInfo struct {
 	AccessToken string `json:"token"`
@@ -70,10 +73,18 @@ func deleteAccessToken() error {
 	return nil
 }
 
-func loadAccessToken(host string) string {
+func loadAccessToken(host string) (string, error) {
+	accessToken := os.Getenv(netlifyEnvAccessToken)
+	if accessToken != "" {
+		if err := tryAccessToken(host, accessToken); err != nil {
+			return "", err
+		}
+		return accessToken, nil
+	}
+
 	home, err := homedir.Dir()
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	var f *os.File
@@ -86,43 +97,40 @@ func loadAccessToken(host string) string {
 	}
 
 	if err != nil || f == nil {
-		return ""
+		return "", err
 	}
 	defer f.Close()
 
-	return loadAccessTokenFromFile(f, host)
+	return loadAccessTokenFromFile(f, host, tryAccessToken)
 }
 
-func loadAccessTokenFromFile(f *os.File, host string) string {
+func loadAccessTokenFromFile(f *os.File, host string, checkHostAccess netlifyHostAccessCheck) (string, error) {
 	config := netlifyConfig{}
 	if err := json.NewDecoder(f).Decode(&config); err != nil {
-		return ""
+		return "", err
 	}
 
 	if config.AccessToken != "" {
-		return config.AccessToken
+		if err := checkHostAccess(host, config.AccessToken); err != nil {
+			return "", err
+		}
+		return config.AccessToken, nil
 	}
 
 	if len(config.Users) == 0 {
-		return ""
+		return "", nil
 	}
 
-	if len(config.Users) == 1 {
-		// return the first token but range over the map
-		// because Go doesn't have a way to give you the
-		// first element
-		for _, user := range config.Users {
-			return user.Auth.AccessToken
-		}
-	}
-
+	var lastError error
 	for _, user := range config.Users {
-		if err := tryAccessToken(host, user.Auth.AccessToken); err == nil {
-			return user.Auth.AccessToken
+		err := checkHostAccess(host, user.Auth.AccessToken)
+		if err == nil {
+			return user.Auth.AccessToken, nil
 		}
+		lastError = err
 	}
 
-	return ""
+	return "", lastError
 }
 
 func tryAccessToken(host, token string) error {
@@ -132,8 +140,16 @@ func tryAccessToken(host, token string) error {
 		return nil
 	}
 	client, ctx := newNetlifyApiClient(credentials)
-	_, err := client.GetSite(ctx, host)
-	return err
+	site, err := client.GetSite(ctx, host)
+	if err != nil {
+		return err
+	}
+
+	if site == nil {
+		return fmt.Errorf("Unknown Netlify site: `%s`", host)
+	}
+
+	return nil
 }
 
 func newNetlifyApiClient(credentials func(r runtime.ClientRequest, _ strfmt.Registry) error) (*porcelain.Netlify, context.Context) {

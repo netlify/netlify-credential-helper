@@ -104,12 +104,11 @@ func printVersion(out io.Writer) error {
 }
 
 func getAccessToken(host string) (string, error) {
-	accessToken := os.Getenv(netlifyEnvAccessToken)
-	if accessToken != "" {
-		return accessToken, nil
+	accessToken, err := loadAccessToken(host)
+	if err != nil {
+		return "", err
 	}
 
-	accessToken = loadAccessToken(host)
 	if accessToken != "" {
 		return accessToken, nil
 	}
@@ -119,9 +118,10 @@ func getAccessToken(host string) (string, error) {
 		clientID = netlifyDefaultClientID
 	}
 
-	accessToken, err := login(clientID)
+	accessToken, err = login(clientID, host)
 	if err != nil {
 		return "", err
 	}
+
 	return accessToken, nil
 }

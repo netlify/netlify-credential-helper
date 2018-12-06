@@ -15,7 +15,7 @@ const (
 
 var apiSchemes = []string{netlifyApiScheme}
 
-func login(clientID string) (string, error) {
+func login(clientID, host string) (string, error) {
 	client, ctx := newNetlifyApiClient(noCredentials)
 	ticket, err := client.CreateTicket(ctx, clientID)
 	if err != nil {
@@ -41,6 +41,10 @@ func login(clientID string) (string, error) {
 	}
 
 	if err := saveAccessToken(token.AccessToken); err != nil {
+		return "", err
+	}
+
+	if err := tryAccessToken(host, token.AccessToken); err != nil {
 		return "", err
 	}
 
