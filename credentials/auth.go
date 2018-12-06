@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/netlify/open-api/go/plumbing/operations"
 	"github.com/netlify/open-api/go/porcelain"
 	apiContext "github.com/netlify/open-api/go/porcelain/context"
 )
@@ -142,11 +143,22 @@ func tryAccessToken(host, token string) error {
 	client, ctx := newNetlifyApiClient(credentials)
 	site, err := client.GetSite(ctx, host)
 	if err != nil {
+		if apiErr, ok := err.(*operations.GetSiteDefault); ok && apiErr.Payload.Code == 404 {
+			return fmt.Errorf("Unknown Netlify site: `%s`", host)
+		}
 		return err
 	}
 
-	if site == nil {
+	if site == nil || len(site.Capabilities) == 0 {
 		return fmt.Errorf("Unknown Netlify site: `%s`", host)
+	}
+
+	enabled, ok := site.Capabilities[netlifyLargeMediaCapability]
+	if !ok {
+		return fmt.Errorf("Netlify Large Media is not enabled for this site")
+	}
+	if e, ok := enabled.(bool); !ok || !e {
+		return fmt.Errorf("Netlify Large Media is not enabled for this site")
 	}
 
 	return nil
