@@ -15,10 +15,12 @@ const (
 	netlifyAccessTokenUser = "access-token"
 	netlifyDefaultClientID = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
 	netlifyApiPath         = "/api/v1"
+	netlifyLfsPath         = "/.netlify/lfs"
 
 	gitHostKey     = "host"
 	gitUsernameKey = "username"
 	gitPasswordKey = "password"
+	gitPathKey     = "path"
 )
 
 var (
@@ -79,6 +81,10 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 	host, exist := data[gitHostKey]
 	if !exist {
 		return fmt.Errorf("Missing host to check credentials: %s", buffer.String())
+	}
+
+	if path, exist := data[gitPathKey]; !exist || path != netlifyLfsPath {
+		return fmt.Errorf("Invalid LFS path: %s", buffer.String())
 	}
 
 	accessToken, err := getAccessToken(host)
