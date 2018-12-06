@@ -48,7 +48,7 @@ func handleCommand(key string, in io.Reader, out io.Writer) error {
 	case "get":
 		return getCredentials(in, out)
 	case "erase":
-		return eraseCredentials(in)
+		return deleteAccessToken()
 	case "version":
 		return printVersion(out)
 	}
@@ -89,12 +89,6 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 
 	fmt.Fprint(writer, buffer.String())
 	return nil
-}
-
-// eraseCredentials removes credentials from the store.
-// The reader must contain the server URL to remove.
-func eraseCredentials(reader io.Reader) error {
-	return deleteAccessToken()
 }
 
 func printVersion(out io.Writer) error {
