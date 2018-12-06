@@ -13,7 +13,7 @@ var validAuthPaths = [][]string{
 	{".netlify", "config"},
 }
 
-func SaveAccessToken(token string) error {
+func saveAccessToken(token string) error {
 	home, err := homedir.Dir()
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func SaveAccessToken(token string) error {
 	return json.NewEncoder(f).Encode(&config)
 }
 
-func DeleteAccessToken() error {
+func deleteAccessToken() error {
 	home, err := homedir.Dir()
 	if err != nil {
 		return nil
@@ -49,7 +49,7 @@ func DeleteAccessToken() error {
 	return nil
 }
 
-func LoadAccessToken() string {
+func loadAccessToken() string {
 	home, err := homedir.Dir()
 	if err != nil {
 		return ""

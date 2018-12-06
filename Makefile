@@ -39,6 +39,7 @@ clean_release: ## Remove a release artifact.
 deps: ## Install dependencies.
 	@echo "Installing dependencies"
 	@GO111MODULE=on go mod verify
+	@GO111MODULE=on go mod tidy
 
 package_linux: override os=linux
 package_linux: build_linux clean_release ## Build a release package for Linux.

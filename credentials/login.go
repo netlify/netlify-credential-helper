@@ -21,7 +21,7 @@ const (
 
 var apiSchemes = []string{netlifyApiScheme}
 
-func Login(clientID string) (string, error) {
+func login(clientID string) (string, error) {
 	transport := client.New(netlifyApiHost, "/api/v1", apiSchemes)
 	client := porcelain.New(transport, strfmt.Default)
 
@@ -51,7 +51,7 @@ func Login(clientID string) (string, error) {
 		return "", err
 	}
 
-	if err := SaveAccessToken(token.AccessToken); err != nil {
+	if err := saveAccessToken(token.AccessToken); err != nil {
 		return "", err
 	}
 

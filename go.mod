@@ -5,7 +5,6 @@ require (
 	github.com/Azure/go-autorest v11.2.8+incompatible // indirect
 	github.com/cenkalti/backoff v2.1.0+incompatible // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
-	github.com/docker/docker-credential-helpers v0.6.1
 	github.com/go-openapi/runtime v0.17.2
 	github.com/go-openapi/strfmt v0.17.2
 	github.com/mitchellh/go-homedir v1.0.0
@@ -15,5 +14,3 @@ require (
 	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
 	go.opencensus.io v0.18.0 // indirect
 )
-
-replace github.com/docker/docker-credential-helpers v0.6.1 => github.com/calavera/docker-credential-helpers v0.0.0-20181130222943-c804d066b691
