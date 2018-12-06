@@ -126,18 +126,21 @@ func loadAccessTokenFromFile(f *os.File, host string) string {
 }
 
 func tryAccessToken(host, token string) error {
-	transport := client.New(netlifyApiHost, "/api/v1", apiSchemes)
-	client := porcelain.New(transport, strfmt.Default)
-
 	credentials := func(r runtime.ClientRequest, _ strfmt.Registry) error {
 		r.SetHeaderParam("User-Agent", "git-credential-netlify")
 		r.SetHeaderParam("Authorization", "Bearer "+token)
 		return nil
 	}
+	client, ctx := newNetlifyApiClient(credentials)
+	_, err := client.GetSite(ctx, host)
+	return err
+}
+
+func newNetlifyApiClient(credentials func(r runtime.ClientRequest, _ strfmt.Registry) error) (*porcelain.Netlify, context.Context) {
+	transport := client.New(netlifyApiHost, netlifyApiPath, apiSchemes)
+	client := porcelain.New(transport, strfmt.Default)
 
 	creds := runtime.ClientAuthInfoWriterFunc(credentials)
 	ctx := apiContext.WithAuthInfo(context.Background(), creds)
-
-	_, err := client.GetSite(ctx, host)
-	return err
+	return client, ctx
 }
