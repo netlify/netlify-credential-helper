@@ -11,8 +11,6 @@ github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdko
 github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf h1:eg0MeVzsP1G42dRafH3vf+al2vQIJU0YHX+1Tw87oco=
 github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
-github.com/calavera/docker-credential-helpers v0.0.0-20181130222943-c804d066b691 h1:S/gLCGLEZ9e29fntu9ziUJ2jmysN5cBZwqQnTeW/bME=
-github.com/calavera/docker-credential-helpers v0.0.0-20181130222943-c804d066b691/go.mod h1:fbo88NttOP5aqJBhq1xLQRUC8SZV74tIQ8L+yvRhCfI=
 github.com/cenkalti/backoff v2.1.0+incompatible h1:FIRvWBZrzS4YC7NT5cOuZjexzFvIr+Dbi6aD1cZaNBk=
 github.com/cenkalti/backoff v2.1.0+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/census-instrumentation/opencensus-proto v0.0.2-0.20180913191712-f303ae3f8d6a h1:t88pXOTS5K+pjfuhTOcul6sdC4khgqB8ukyfbe62Zxo=

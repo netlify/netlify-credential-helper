@@ -1,16 +1,10 @@
 package credentials
 
 import (
-	"context"
-
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/netlify/open-api/go/models"
-	"github.com/netlify/open-api/go/porcelain"
 	"github.com/skratchdot/open-golang/open"
-
-	apiContext "github.com/netlify/open-api/go/porcelain/context"
 )
 
 const (
@@ -21,13 +15,8 @@ const (
 
 var apiSchemes = []string{netlifyApiScheme}
 
-func Login(clientID string) (string, error) {
-	transport := client.New(netlifyApiHost, "/api/v1", apiSchemes)
-	client := porcelain.New(transport, strfmt.Default)
-
-	creds := runtime.ClientAuthInfoWriterFunc(noCredentials)
-	ctx := apiContext.WithAuthInfo(context.Background(), creds)
-
+func login(clientID string) (string, error) {
+	client, ctx := newNetlifyApiClient(noCredentials)
 	ticket, err := client.CreateTicket(ctx, clientID)
 	if err != nil {
 		return "", err
@@ -51,7 +40,7 @@ func Login(clientID string) (string, error) {
 		return "", err
 	}
 
-	if err := SaveAccessToken(token.AccessToken); err != nil {
+	if err := saveAccessToken(token.AccessToken); err != nil {
 		return "", err
 	}
 
