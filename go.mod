@@ -7,6 +7,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-openapi/runtime v0.17.2
 	github.com/go-openapi/strfmt v0.17.2
+	github.com/mattn/go-isatty v0.0.4
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/netlify/open-api v0.5.0
 	github.com/rsc/goversion v1.2.0 // indirect
