@@ -9,12 +9,23 @@ jobs:
     modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
 
   steps:
-  - script: |
-      mkdir -p '$(modulePath)'
-      shopt -s extglob
-      mv !(gopath) '$(modulePath)'
-    displayName: 'Set up the Go workspace'
-
-  - script: make test
-    workingDirectory: '$(modulePath)'
-    displayName: 'Get dependencies, then run tests'
+  - ${{ if ne(parameters.name, 'Windows') }}:
+    - script: |
+        mkdir -p '$(modulePath)'
+        shopt -s extglob
+        mv !(gopath) '$(modulePath)'
+      displayName: 'Set up the Go workspace'
+    - script: make test
+      workingDirectory: '$(modulePath)'
+      displayName: 'Get dependencies, then run tests'
+  - ${{ if eq(parameters.name, 'Windows') }}:
+    - script: |
+        md '$(modulePath)'
+        move !(gopath) '$(modulePath)'
+      displayName: 'Set up the Go workspace'
+    - script: |
+        go mod verify
+        go mod tidy
+        go test -v ./...
+      workingDirectory: '$(modulePath)'
+      displayName: 'Get dependencies, then run tests'
