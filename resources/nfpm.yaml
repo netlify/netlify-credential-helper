@@ -1,0 +1,20 @@
+# nfpm example config file
+name: "git-credential-netlify"
+arch: "amd64"
+platform: "linux"
+version: "v${TAG}"
+section: "default"
+priority: "extra"
+replaces:
+- git-credential-netlify
+provides:
+- git-credential-netlify
+maintainer: "Netlify OSS <oss@netlify.com>"
+description: |
+  Git credential helper to use Netlify's API as authentication backend
+vendor: "Netlify"
+homepage: "https://github.com/netlify/netlify-credential-helper"
+license: "MIT"
+bindir: "/usr/local/bin"
+files:
+  "builds/linux-release/git-credential-netlify": "/usr/local/bin/git-credential-netlify"

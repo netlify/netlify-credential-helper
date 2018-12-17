@@ -1,10 +1,16 @@
-.PHONY: all build_linux build_macosx build_windows clean clean_release deps package_linux package_macosx package_windows release test
+.PHONY: all build_linux build_macosx build_windows clean clean_release deps package_deb package_linux package_macosx package_rpm package_windows release test
 
 define build
 	@echo "Building git-credential-netlify for $(os)/$(arch)"
 	@mkdir -p builds/$(os)-${TAG}
 	@GO111MODULE=on CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -ldflags "-X github.com/netlify/netlify-credential-helper/credentials.Version=${TAG} -X github.com/netlify/netlify-credential-helper/credentials.SHA=`git rev-parse HEAD`" -o builds/$(os)-${TAG}/git-credential-netlify cmd/netlify-credential-helper/main.go
 	@echo "Built: builds/$(os)-${TAG}/git-credential-netlify"
+endef
+
+define linux_package
+	@mkdir -p builds/$(os)-release
+	@cp -f builds/$(os)-${TAG}/git-credential-netlify builds/$(os)-release/git-credential-netlify 
+	@nfpm -f resources/nfpm.yaml pkg --target releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.$(1)
 endef
 
 help: ## Show this help.
@@ -34,12 +40,17 @@ clean: ## Remove all artifacts.
 
 clean_release: ## Remove a release artifact.
 	@mkdir -p releases/${TAG}
-	@rm -f releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.tar.gz
+	@rm -f releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.*
+	@rm -rf pkg-build
 
 deps: ## Install dependencies.
 	@echo "Installing dependencies"
 	@GO111MODULE=on go mod verify
 	@GO111MODULE=on go mod tidy
+
+package_deb: override os=linux
+package_deb: build_linux clean_release ## Build a release package for Debian and Ubuntu.
+	$(call linux_package,deb)
 
 package_linux: override os=linux
 package_linux: build_linux clean_release ## Build a release package for Linux.
@@ -49,13 +60,17 @@ package_macosx: override os=darwin
 package_macosx: build_macosx clean_release ## Build a release package for Mac OS X.
 	@tar -czf releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.tar.gz -C builds/$(os)-${TAG} $(binary)
 
+package_rpm: override os=linux
+package_rpm: build_linux clean_release ## Build a release package for Red Hat, Fedora and CentOS.
+	$(call linux_package,rpm)
+
 package_windows: override os=windows
 package_windows: build_windows clean_release ## Build a release package for Windows.
 	@zip -j releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.zip builds/$(os)-${TAG}/$(binary)
 
 release: package_linux package_macosx package_windows ## Create a GitHub release and upload packages.
 	@echo "Creating release"
-	@hub release create -a releases/${TAG}/$(binary)-darwin-$(arch)-${TAG}.tar.gz -a releases/${TAG}/$(binary)-linux-$(arch)-${TAG}.tar.gz -a releases/${TAG}/$(binary)-windows-$(arch)-${TAG}.zip v${TAG}
+	@hub release create -a releases/${TAG}/$(binary)-darwin-$(arch)-${TAG}.tar.gz -a releases/${TAG}/$(binary)-linux-$(arch)-${TAG}.tar.gz -a releases/${TAG}/$(binary)-linux-$(arch)-${TAG}.rpm -a releases/${TAG}/$(binary)-linux-$(arch)-${TAG}.rpm -a releases/${TAG}/$(binary)-windows-$(arch)-${TAG}.zip v${TAG}
 
 test: deps ## Run tests.
 	@go test -v ./...
