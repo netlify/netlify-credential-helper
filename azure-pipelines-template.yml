@@ -2,24 +2,28 @@ jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: ${{ parameters.vmImage }}
-  
+
   variables:
-    GOBIN:  '$(GOPATH)/bin' # Go binaries path
-    GOROOT: '/usr/local/go1.11' # Go installation path
+    GO111MODULE: on # Enable Go Modules
     GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
     modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
-  
+
   steps:
+  - ${{ if ne(parameters.name, 'Windows') }}:
+    - script: |
+        mkdir -p '$(modulePath)'
+        shopt -s extglob
+        mv !(gopath) '$(modulePath)'
+      displayName: 'Set up the Go workspace'
+  - ${{ if eq(parameters.name, 'Windows') }}:
+    - powershell: |
+        New-Item -Path $env:modulePath -ItemType Directory -Force
+        Get-ChildItem -Exclude "gopath" -Force | Move-Item -Destination $env:modulePath
+        New-Item -Path $env:GOPATH/pkg -ItemType Directory -Force
+      displayName: 'Set up the Go workspace'
   - script: |
-      mkdir -p '$(GOBIN)'
-      mkdir -p '$(GOPATH)/pkg'
-      mkdir -p '$(modulePath)'
-      shopt -s extglob
-      mv !(gopath) '$(modulePath)'
-      echo '##vso[task.prependpath]$(GOBIN)'
-      echo '##vso[task.prependpath]$(GOROOT)/bin'
-    displayName: 'Set up the Go workspace'
-  
-  - script: make test
+      go mod verify
+      go mod tidy
+      go test -v ./...
     workingDirectory: '$(modulePath)'
     displayName: 'Get dependencies, then run tests'
