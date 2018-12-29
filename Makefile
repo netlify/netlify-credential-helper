@@ -1,4 +1,4 @@
-.PHONY: all build_linux build_macosx build_windows clean clean_release deps package_deb package_linux package_macosx package_rpm package_windows release test
+.PHONY: all build_linux build_macosx build_windows clean clean_release deps package_deb package_linux package_macosx package_rpm package_windows release release_artifacts release_checksums release_installers release_upload test
 
 define build
 	@echo "Building git-credential-netlify for $(os)/$(arch)"
@@ -10,7 +10,7 @@ endef
 define linux_package
 	@mkdir -p builds/$(os)-release
 	@cp -f builds/$(os)-${TAG}/git-credential-netlify builds/$(os)-release/git-credential-netlify 
-	@nfpm -f resources/nfpm.yaml pkg --target releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.$(1)
+	@nfpm -f resources/nfpm.yaml pkg --target releases/${TAG}/$(binary)-$(os)-$(arch).$(1)
 endef
 
 help: ## Show this help.
@@ -54,11 +54,11 @@ package_deb: build_linux clean_release ## Build a release package for Debian and
 
 package_linux: override os=linux
 package_linux: build_linux clean_release ## Build a release package for Linux.
-	@tar -czf releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.tar.gz -C builds/$(os)-${TAG} $(binary)
+	@tar -czf releases/${TAG}/$(binary)-$(os)-$(arch).tar.gz -C builds/$(os)-${TAG} $(binary)
 
 package_macosx: override os=darwin
 package_macosx: build_macosx clean_release ## Build a release package for Mac OS X.
-	@tar -czf releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.tar.gz -C builds/$(os)-${TAG} $(binary)
+	@tar -czf releases/${TAG}/$(binary)-$(os)-$(arch).tar.gz -C builds/$(os)-${TAG} $(binary)
 
 package_rpm: override os=linux
 package_rpm: build_linux clean_release ## Build a release package for Red Hat, Fedora and CentOS.
@@ -66,11 +66,31 @@ package_rpm: build_linux clean_release ## Build a release package for Red Hat, F
 
 package_windows: override os=windows
 package_windows: build_windows clean_release ## Build a release package for Windows.
-	@zip -j releases/${TAG}/$(binary)-$(os)-$(arch)-${TAG}.zip builds/$(os)-${TAG}/$(binary)
+	@zip -j releases/${TAG}/$(binary)-$(os)-$(arch).zip builds/$(os)-${TAG}/$(binary)
 
-release: package_linux package_macosx package_windows ## Create a GitHub release and upload packages.
-	@echo "Creating release"
-	@hub release create -a releases/${TAG}/$(binary)-darwin-$(arch)-${TAG}.tar.gz -a releases/${TAG}/$(binary)-linux-$(arch)-${TAG}.tar.gz -a releases/${TAG}/$(binary)-linux-$(arch)-${TAG}.rpm -a releases/${TAG}/$(binary)-linux-$(arch)-${TAG}.rpm -a releases/${TAG}/$(binary)-windows-$(arch)-${TAG}.zip v${TAG}
+release: release_upload release_installers ## Release a new version of git-credential-netlify. Create artifacts and installers, and upload them.
+
+release_artifacts: package_linux package_deb package_rpm package_macosx package_windows release_checksums ## Build all the release artifacts.
+	@echo "Release artifacts created in releases/${TAG}"
+
+release_checksums: ## Calculate checksums for release artifacts.
+	@rm -f releases/${TAG}/checksums.txt
+	@sha256sum releases/${TAG}/$(binary)-darwin-$(arch).tar.gz >> releases/${TAG}/checksums.txt
+	@sha256sum releases/${TAG}/$(binary)-linux-$(arch).tar.gz  >> releases/${TAG}/checksums.txt
+	@sha256sum releases/${TAG}/$(binary)-linux-$(arch).deb     >> releases/${TAG}/checksums.txt
+	@sha256sum releases/${TAG}/$(binary)-linux-$(arch).rpm     >> releases/${TAG}/checksums.txt
+	@sha256sum releases/${TAG}/$(binary)-windows-$(arch).zip   >> releases/${TAG}/checksums.txt
+
+release_installers: ## Release Homebrew and Scoop installers.
+	@git submodule update --init
+	@sha256sum releases/${TAG}/git-credential-netlify-darwin-amd64.tar.gz | awk '{ print $$1 }' | xargs -I '{}' sed -e 's/{SHA256}/{}/' resources/homebrew-template.rb | sed -e 's/{TAG}/${TAG}/' > installers/homebrew-git-credential-netlify/git-credential-netlify.rb
+	@sha256sum releases/${TAG}/git-credential-netlify-windows-amd64.zip | awk '{ print $$1 }' | xargs -I '{}' sed -e 's/{SHA256}/{}/' resources/scoop-template.json | sed -e 's/{TAG}/${TAG}/' > installers/scoop-git-credential-netlify/git-credential-netlify.json
+	@cd installers/homebrew-git-credential-netlify/ && git add . && git commit -m "Release Version ${TAG}" && git push origin master
+	@cd installers/scoop-git-credential-netlify/ && git add . && git commit -m "Release Version ${TAG}" && git push origin master
+
+release_upload: release_artifacts ## Upload release artifacts to GitHub.
+	@echo "Uploading release"
+	@hub release create -a releases/${TAG}/$(binary)-darwin-$(arch).tar.gz -a releases/${TAG}/$(binary)-linux-$(arch).tar.gz -a releases/${TAG}/$(binary)-linux-$(arch).deb -a releases/${TAG}/$(binary)-linux-$(arch).rpm -a releases/${TAG}/$(binary)-windows-$(arch).zip -a releases/${TAG}/checksums.txt v${TAG}
 
 test: deps ## Run tests.
 	@GO111MODULE=on go test -v ./...
