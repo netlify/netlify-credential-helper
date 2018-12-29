@@ -1,4 +1,4 @@
-.PHONY: all build_linux build_macosx build_windows clean clean_release deps package_deb package_linux package_macosx package_rpm package_windows release test
+.PHONY: all build_linux build_macosx build_windows clean clean_release deps package_deb package_linux package_macosx package_rpm package_windows release release_artifacts release_checksums release_installers release_upload test
 
 define build
 	@echo "Building git-credential-netlify for $(os)/$(arch)"
@@ -68,7 +68,7 @@ package_windows: override os=windows
 package_windows: build_windows clean_release ## Build a release package for Windows.
 	@zip -j releases/${TAG}/$(binary)-$(os)-$(arch).zip builds/$(os)-${TAG}/$(binary)
 
-release: release_upload release_installers
+release: release_upload release_installers ## Release a new version of git-credential-netlify. Create artifacts and installers, and upload them.
 
 release_artifacts: package_linux package_deb package_rpm package_macosx package_windows release_checksums ## Build all the release artifacts.
 	@echo "Release artifacts created in releases/${TAG}"
