@@ -68,19 +68,29 @@ package_windows: override os=windows
 package_windows: build_windows clean_release ## Build a release package for Windows.
 	@zip -j releases/${TAG}/$(binary)-$(os)-$(arch).zip builds/$(os)-${TAG}/$(binary)
 
-release: release_artifacts ## Create a GitHub release and upload packages.
-	@echo "Uploading release"
-	@hub release create -a releases/${TAG}/$(binary)-darwin-$(arch).tar.gz -a releases/${TAG}/$(binary)-linux-$(arch).tar.gz -a releases/${TAG}/$(binary)-linux-$(arch).deb -a releases/${TAG}/$(binary)-linux-$(arch).rpm -a releases/${TAG}/$(binary)-windows-$(arch).zip -a releases/${TAG}/checksums.txt v${TAG}
+release: release_upload release_installers
 
 release_artifacts: package_linux package_deb package_rpm package_macosx package_windows release_checksums ## Build all the release artifacts.
 	@echo "Release artifacts created in releases/${TAG}"
 
-release_checksums: ## Calculate checksums for release artifacts
+release_checksums: ## Calculate checksums for release artifacts.
+	@rm -f releases/${TAG}/checksums.txt
 	@sha256sum releases/${TAG}/$(binary)-darwin-$(arch).tar.gz >> releases/${TAG}/checksums.txt
 	@sha256sum releases/${TAG}/$(binary)-linux-$(arch).tar.gz  >> releases/${TAG}/checksums.txt
 	@sha256sum releases/${TAG}/$(binary)-linux-$(arch).deb     >> releases/${TAG}/checksums.txt
 	@sha256sum releases/${TAG}/$(binary)-linux-$(arch).rpm     >> releases/${TAG}/checksums.txt
 	@sha256sum releases/${TAG}/$(binary)-windows-$(arch).zip   >> releases/${TAG}/checksums.txt
+
+release_installers: ## Release Homebrew and Scoop installers.
+	@git submodule update --init
+	@sha256sum releases/${TAG}/git-credential-netlify-darwin-amd64.tar.gz | awk '{ print $$1 }' | xargs -I '{}' sed -e 's/{SHA256}/{}/' resources/homebrew-template.rb | sed -e 's/{TAG}/${TAG}/' > installers/homebrew-git-credential-netlify/git-credential-netlify.rb
+	@sha256sum releases/${TAG}/git-credential-netlify-windows-amd64.zip | awk '{ print $$1 }' | xargs -I '{}' sed -e 's/{SHA256}/{}/' resources/scoop-template.json | sed -e 's/{TAG}/${TAG}/' > installers/scoop-git-credential-netlify/git-credential-netlify.json
+	@cd installers/homebrew-git-credential-netlify/ && git add . && git commit -m "Release Version ${TAG}" && git push origin master
+	@cd installers/scoop-git-credential-netlify/ && git add . && git commit -m "Release Version ${TAG}" && git push origin master
+
+release_upload: release_artifacts ## Upload release artifacts to GitHub.
+	@echo "Uploading release"
+	@hub release create -a releases/${TAG}/$(binary)-darwin-$(arch).tar.gz -a releases/${TAG}/$(binary)-linux-$(arch).tar.gz -a releases/${TAG}/$(binary)-linux-$(arch).deb -a releases/${TAG}/$(binary)-linux-$(arch).rpm -a releases/${TAG}/$(binary)-windows-$(arch).zip -a releases/${TAG}/checksums.txt v${TAG}
 
 test: deps ## Run tests.
 	@GO111MODULE=on go test -v ./...

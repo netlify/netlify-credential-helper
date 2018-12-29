@@ -1,0 +1,6 @@
+{
+  "version": "{TAG}",
+  "bin": "git-credential-netlify",
+  "url": "https://github.com/netlify/netlify-credential-helper/releases/download/v{TAG}/git-credential-netlify-windows-amd64.zip",
+  "hash": "{SHA256}"
+}
