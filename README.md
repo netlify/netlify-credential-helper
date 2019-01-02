@@ -43,6 +43,8 @@ sudo dnf install git-credential-netlify-linux-amd64.rpm
 
 ### Install on MacOS X with Homebrew
 
+1. Open a terminal and copy these two commands:
+
 ```
 brew tap netlify/git-credential-netlify
 brew install git-credential-netlify
@@ -50,11 +52,16 @@ brew install git-credential-netlify
 
 ### Install on Windows with Powershell
 
+1. Start a Powershell session and copy these two commands:
+
 ```
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 iex (iwr https://github.com/netlify/netlify-credential-helper/raw/master/resources/install.ps1)
 ```
 
 ### Install on Windows with Scoop
+
+1. Start a Powershell session and copy these two commands:
 
 ```
 scoop bucket add netlifyctl https://github.com/netlify/scoop-git-credential-netlify
