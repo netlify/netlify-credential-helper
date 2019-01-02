@@ -19,6 +19,7 @@ After installing the helper, add the credential definition to you Git config:
 ```
 [credential]
 	helper = netlify
+	useHttpPath = true
 ```
 
 ### Install on Debian/Ubuntu
