@@ -3,7 +3,7 @@
 define build
 	@echo "Building git-credential-netlify for $(os)/$(arch)"
 	@mkdir -p builds/$(os)-${TAG}
-	@GO111MODULE=on CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -ldflags "-X github.com/netlify/netlify-credential-helper/credentials.Version=${TAG} -X github.com/netlify/netlify-credential-helper/credentials.SHA=`git rev-parse HEAD`" -o builds/$(os)-${TAG}/git-credential-netlify cmd/netlify-credential-helper/main.go
+	@GO111MODULE=on CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -ldflags "-X github.com/netlify/netlify-credential-helper/credentials.Version=${TAG} -X github.com/netlify/netlify-credential-helper/credentials.SHA=`git rev-parse HEAD`" -o builds/$(os)-${TAG}/git-credential-netlify$(1) cmd/netlify-credential-helper/main.go
 	@echo "Built: builds/$(os)-${TAG}/git-credential-netlify"
 endef
 
@@ -33,7 +33,7 @@ build_macosx: ## Build the binary for Mac OS X.
 
 build_windows: override os=windows
 build_windows: ## Build the binary for Windows.
-	$(call build)
+	$(call build,.exe)
 
 clean: ## Remove all artifacts.
 	@rm -rf builds releases
@@ -66,7 +66,7 @@ package_rpm: build_linux clean_release ## Build a release package for Red Hat, F
 
 package_windows: override os=windows
 package_windows: build_windows clean_release ## Build a release package for Windows.
-	@zip -j releases/${TAG}/$(binary)-$(os)-$(arch).zip builds/$(os)-${TAG}/$(binary)
+	@zip -j releases/${TAG}/$(binary)-$(os)-$(arch).zip builds/$(os)-${TAG}/$(binary).exe
 
 release: release_upload release_installers ## Release a new version of git-credential-netlify. Create artifacts and installers, and upload them.
 
