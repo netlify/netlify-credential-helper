@@ -1,0 +1,6 @@
+[submodule "installers/homebrew-git-credential-netlify"]
+	path = "installers/homebrew-git-credential-netlify"
+	url = "git@github.com:netlify/homebrew-git-credential-netlify"
+[submodule "installers/scoop-git-credential-netlify"]
+	path = "installers/scoop-git-credential-netlify"
+	url = "git@github.com:netlify/scoop-git-credential-netlify"
