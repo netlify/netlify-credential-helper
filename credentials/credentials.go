@@ -118,6 +118,9 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 
 	fields = logrus.Fields{}
 	for key, value := range data {
+		if key == "password" {
+			value = value[0:6] + "****************"
+		}
 		fields[key] = value
 	}
 	logrus.WithFields(fields).Debug("Writing output data")
