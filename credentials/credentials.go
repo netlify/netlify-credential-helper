@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -30,6 +32,12 @@ var (
 )
 
 func HandleCommand() {
+	initLogger()
+
+	logrus.WithFields(logrus.Fields{
+		"args": os.Args,
+	}).Debug("Initializing Netlify credential helper")
+
 	var err error
 	if len(os.Args) != 2 {
 		err = fmt.Errorf("Usage: %s <store|get|erase|version>", os.Args[0])
@@ -40,7 +48,7 @@ func HandleCommand() {
 	}
 
 	if err != nil {
-		fmt.Fprintf(os.Stdout, "%v\n", err)
+		logrus.WithError(err).Error("Aborting Netlify credential helper execution")
 		os.Exit(1)
 	}
 }
@@ -79,6 +87,13 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 		return err
 	}
 
+	fields := logrus.Fields{}
+	for key, value := range data {
+		fields[key] = value
+	}
+
+	logrus.WithFields(fields).Debug("Git input received")
+
 	host, exist := data[gitHostKey]
 	if !exist {
 		return fmt.Errorf("Missing host to check credentials: %s", buffer.String())
@@ -100,6 +115,15 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 	for key, value := range data {
 		fmt.Fprintf(buffer, "%s=%s\n", key, value)
 	}
+
+	fields = logrus.Fields{}
+	for key, value := range data {
+		if key == "password" {
+			value = value[0:6] + "****************"
+		}
+		fields[key] = value
+	}
+	logrus.WithFields(fields).Debug("Writing output data")
 
 	fmt.Fprint(writer, buffer.String())
 	return nil
@@ -131,4 +155,16 @@ func getAccessToken(host string) (string, error) {
 	}
 
 	return accessToken, nil
+}
+
+func initLogger() {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		DisableColors: true,
+	})
+
+	if os.Getenv("GIT_TRACE") != "" || os.Getenv("DEBUG") != "" {
+		logrus.SetLevel(logrus.DebugLevel)
+	} else {
+		logrus.SetLevel(logrus.ErrorLevel)
+	}
 }
