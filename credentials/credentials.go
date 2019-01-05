@@ -158,6 +158,10 @@ func getAccessToken(host string) (string, error) {
 }
 
 func initLogger() {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		DisableColors: true,
+	})
+
 	if os.Getenv("GIT_TRACE") != "" || os.Getenv("DEBUG") != "" {
 		logrus.SetLevel(logrus.DebugLevel)
 	} else {
