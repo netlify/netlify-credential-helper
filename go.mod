@@ -11,7 +11,7 @@ require (
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/netlify/open-api v0.5.0
 	github.com/rsc/goversion v1.2.0 // indirect
-	github.com/sirupsen/logrus v1.2.0 // indirect
+	github.com/sirupsen/logrus v1.2.0
 	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
 	go.opencensus.io v0.18.0 // indirect
 )
