@@ -5,7 +5,17 @@ that uses Netlify's API to authenticate a user.
 
 ## Install
 
-Choose one of the installation options:
+Our preferred way to install this software is by using Netlify's CLI plugins system:
+
+1. Install Netlify CLI if you have not yet: `npm install netlify-cli`
+2. Install [Netlify's Large Media](https://github.com/netlify/netlify-lm-plugin) plugin: `netlify plugins:install netlify-lm`
+3. Run the LM Setup: `netlify lm:setup`.
+
+Netlify's Large Media plugin will download the latest version of this sofware 
+for your OS, and configure Git to use it when it's necessary. You don't need to
+do anything else.
+
+Alternatively, you can also install this credentials helper manually following one of the guides below:
 
 - [Install on Debian/Ubuntu](#install-on-debianubuntu)
 - [Install on Fedora/RedHat](#install-on-fedoraredhat)
@@ -14,7 +24,7 @@ Choose one of the installation options:
 - [Install on Windows with Scoop](#install-on-windows-with-scoop)
 - [Manual install](#manual-install)
 
-After installing the helper, add the credential definition to you Git config:
+After manually installing the helper, you'll need to add the credential definition to you Git config:
 
 ```
 [credential]
