@@ -35,6 +35,7 @@ type netlifyConfig struct {
 var validAuthPaths = [][]string{
 	{".config", "netlify"},
 	{".netlify", "config"},
+	{".netlify", "config.json"},
 	{".config", "netlify.json"},
 }
 
