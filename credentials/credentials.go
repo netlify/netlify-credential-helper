@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/sirupsen/logrus"
 )
@@ -27,8 +28,10 @@ const (
 )
 
 var (
-	Version = "static-binary-version"
-	SHA     = "static-binary-sha"
+	tag    = "static-binary-tag"
+	sha    = "static-binary-sha"
+	distro = "static-binary-distro"
+	arch   = "static-binary-arch"
 )
 
 func HandleCommand() {
@@ -63,6 +66,8 @@ func handleCommand(key string, in io.Reader, out io.Writer) error {
 	case "erase":
 		return deleteAccessToken()
 	case "version":
+		return printVersion(out)
+	case "--version":
 		return printVersion(out)
 	}
 	return fmt.Errorf("Unknown credential action `%s`", key)
@@ -130,7 +135,7 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 }
 
 func printVersion(out io.Writer) error {
-	_, err := fmt.Fprintf(out, "Version: %s\nGit SHA: %s\n", Version, SHA)
+	_, err := fmt.Fprintf(out, "git-credential-netlify/%s (Netlify; %s %s; %s; git %s)\n", tag, distro, arch, runtime.Version(), sha[0:8])
 	return err
 }
 
