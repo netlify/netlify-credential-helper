@@ -3,7 +3,12 @@
 define build
 	@echo "Building git-credential-netlify for $(os)/$(arch)"
 	@mkdir -p builds/$(os)-${TAG}
-	@GO111MODULE=on CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -ldflags "-X github.com/netlify/netlify-credential-helper/credentials.Version=${TAG} -X github.com/netlify/netlify-credential-helper/credentials.SHA=`git rev-parse HEAD`" -o builds/$(os)-${TAG}/git-credential-netlify$(1) cmd/netlify-credential-helper/main.go
+	@GO111MODULE=on CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build \
+		-ldflags "-X github.com/netlify/netlify-credential-helper/credentials.tag=${TAG} \
+		-X github.com/netlify/netlify-credential-helper/credentials.sha=`git rev-parse HEAD` \
+		-X github.com/netlify/netlify-credential-helper/credentials.distro=$(os) \
+		-X github.com/netlify/netlify-credential-helper/credentials.arch=$(arch)" \
+		-o builds/$(os)-${TAG}/git-credential-netlify$(1) cmd/netlify-credential-helper/main.go
 	@echo "Built: builds/$(os)-${TAG}/git-credential-netlify"
 endef
 
