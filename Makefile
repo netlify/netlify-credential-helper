@@ -92,6 +92,8 @@ release_installers: ## Release Homebrew and Scoop installers.
 	@sha256sum releases/${TAG}/git-credential-netlify-windows-amd64.zip | awk '{ print $$1 }' | xargs -I '{}' sed -e 's/{SHA256}/{}/' resources/scoop-template.json | sed -e 's/{TAG}/${TAG}/' > installers/scoop-git-credential-netlify/git-credential-netlify.json
 	@cd installers/homebrew-git-credential-netlify/ && git add . && git commit -m "Release Version ${TAG}" && git push origin master
 	@cd installers/scoop-git-credential-netlify/ && git add . && git commit -m "Release Version ${TAG}" && git push origin master
+	@git checkout -b release_${TAG} && git add . && git commit -m "Update installer submodules for release ${TAG}" && git push -u origin release_${TAG}
+	@hub pull-request -m "Update installer submodules for release ${TAG}"
 
 release_upload: release_artifacts ## Upload release artifacts to GitHub.
 	@echo "Uploading release"
