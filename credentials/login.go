@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	netlifyApiScheme = "https"
-	netlifyApiHost   = "api.netlify.com"
+	netlifyAPIScheme = "https"
+	netlifyAPIHost   = "api.netlify.com"
 	netlifyTicketURL = "https://app.netlify.com/authorize?response_type=ticket&ticket="
 )
 
-var apiSchemes = []string{netlifyApiScheme}
+var apiSchemes = []string{netlifyAPIScheme}
 
 func login(clientID, host string) (string, error) {
 	if !isTTY() {
@@ -24,7 +24,7 @@ func login(clientID, host string) (string, error) {
 		return "", nil
 	}
 
-	client, ctx := newNetlifyApiClient(noCredentials)
+	client, ctx := newNetlifyAPIClient(noCredentials)
 	ticket, err := client.CreateTicket(ctx, clientID)
 	if err != nil {
 		return "", err

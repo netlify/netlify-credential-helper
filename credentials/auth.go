@@ -141,7 +141,7 @@ func tryAccessToken(host, token string) error {
 		r.SetHeaderParam("Authorization", "Bearer "+token)
 		return nil
 	}
-	client, ctx := newNetlifyApiClient(credentials)
+	client, ctx := newNetlifyAPIClient(credentials)
 	site, err := client.GetSite(ctx, host)
 	if err != nil {
 		if apiErr, ok := err.(*operations.GetSiteDefault); ok && apiErr.Payload.Code == 404 {
@@ -165,8 +165,8 @@ func tryAccessToken(host, token string) error {
 	return nil
 }
 
-func newNetlifyApiClient(credentials func(r runtime.ClientRequest, _ strfmt.Registry) error) (*porcelain.Netlify, context.Context) {
-	transport := client.New(netlifyApiHost, netlifyApiPath, apiSchemes)
+func newNetlifyAPIClient(credentials func(r runtime.ClientRequest, _ strfmt.Registry) error) (*porcelain.Netlify, context.Context) {
+	transport := client.New(netlifyAPIHost, netlifyAPIPath, apiSchemes)
 	client := porcelain.New(transport, strfmt.Default)
 
 	creds := runtime.ClientAuthInfoWriterFunc(credentials)
