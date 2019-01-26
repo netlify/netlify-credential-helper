@@ -67,7 +67,7 @@ brew install git-credential-netlify
 
 ```
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-iex (iwr https://github.com/netlify/netlify-credential-helper/raw/master/resources/install.ps1)
+iex (iwr -UseBasicParsing -Uri https://github.com/netlify/netlify-credential-helper/raw/master/resources/install.ps1)
 ```
 
 ### Install on Windows with Scoop
