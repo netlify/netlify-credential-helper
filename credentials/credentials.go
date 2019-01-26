@@ -17,8 +17,8 @@ const (
 	netlifyServerName           = "https://api.netlify.com"
 	netlifyAccessTokenUser      = "access-token"
 	netlifyDefaultClientID      = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
-	netlifyApiPath              = "/api/v1"
-	netlifyLfsPath              = "/.netlify/large-media"
+	netlifyAPIPath              = "/api/v1"
+	netlifyLFSPath              = ".netlify/large-media"
 	netlifyLargeMediaCapability = "large_media"
 
 	gitHostKey     = "host"
@@ -34,6 +34,7 @@ var (
 	arch   = "static-binary-arch"
 )
 
+// HandleCommand checks arguments and inits logger.
 func HandleCommand() {
 	initLogger()
 
@@ -101,11 +102,11 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 
 	host, exist := data[gitHostKey]
 	if !exist {
-		return fmt.Errorf("Missing host to check credentials: %s", buffer.String())
+		return fmt.Errorf("Missing host to check credentials: %v", data)
 	}
 
-	if path, exist := data[gitPathKey]; !exist || path != netlifyLfsPath {
-		return fmt.Errorf("Invalid LFS path: %s", buffer.String())
+	if path, exist := data[gitPathKey]; !exist || path != netlifyLFSPath {
+		return fmt.Errorf("Invalid LFS path: %v", data)
 	}
 
 	accessToken, err := getAccessToken(host)
