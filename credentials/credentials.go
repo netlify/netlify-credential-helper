@@ -44,7 +44,7 @@ func HandleCommand() {
 
 	var err error
 	if len(os.Args) != 2 {
-		err = fmt.Errorf("Usage: %s <store|get|erase|version>", os.Args[0])
+		err = fmt.Errorf("Usage: %s <get|version>", os.Args[0])
 	}
 
 	if err == nil {
@@ -60,18 +60,14 @@ func HandleCommand() {
 // handleCommand uses a helper and a key to run a credential action.
 func handleCommand(key string, in io.Reader, out io.Writer) error {
 	switch key {
-	case "store":
-		return nil // this command is not supported, so we can ignore it
 	case "get":
 		return getCredentials(in, out)
-	case "erase":
-		return deleteAccessToken()
 	case "version":
 		return printVersion(out)
 	case "--version":
 		return printVersion(out)
 	}
-	return fmt.Errorf("Unknown credential action `%s`", key)
+	return fmt.Errorf("Invalid Netlify Credential action `%s`", key)
 }
 
 // getCredentials retrieves the credentials for a given server url.
