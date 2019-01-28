@@ -61,20 +61,6 @@ func saveAccessToken(token string) error {
 	return json.NewEncoder(f).Encode(&config)
 }
 
-func deleteAccessToken() error {
-	home, err := homedir.Dir()
-	if err != nil {
-		return nil
-	}
-
-	for _, p := range validAuthPaths {
-		args := append([]string{home}, p...)
-		os.Remove(filepath.Join(args...))
-	}
-
-	return nil
-}
-
 func loadAccessToken(host string) (string, error) {
 	accessToken := os.Getenv(netlifyEnvAccessToken)
 	if accessToken != "" {
