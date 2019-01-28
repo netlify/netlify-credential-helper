@@ -100,13 +100,16 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 
 	logrus.WithFields(fields).Debug("Git input received")
 
+	if path, exist := data[gitPathKey]; !exist || path != netlifyLFSPath {
+		// Ignore urls that don't match the path without
+		// logging an error. We don't care about these urls,
+		// and that's ok.
+		return nil
+	}
+
 	host, exist := data[gitHostKey]
 	if !exist {
 		return fmt.Errorf("Missing host to check credentials: %v", data)
-	}
-
-	if path, exist := data[gitPathKey]; !exist || path != netlifyLFSPath {
-		return fmt.Errorf("Invalid LFS path: %v", data)
 	}
 
 	accessToken, err := getAccessToken(host)
