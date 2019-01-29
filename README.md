@@ -29,7 +29,6 @@ After manually installing the helper, you'll need to add the credential definiti
 ```
 [credential]
 	helper = netlify
-	useHttpPath = true
 ```
 
 ### Install on Debian/Ubuntu
