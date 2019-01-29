@@ -18,7 +18,6 @@ const (
 	netlifyAccessTokenUser      = "access-token"
 	netlifyDefaultClientID      = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
 	netlifyAPIPath              = "/api/v1"
-	netlifyLFSPath              = ".netlify/large-media"
 	netlifyLargeMediaCapability = "large_media"
 
 	gitHostKey     = "host"
@@ -95,13 +94,6 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 	}
 
 	logrus.WithFields(fields).Debug("Git input received")
-
-	if path, exist := data[gitPathKey]; !exist || path != netlifyLFSPath {
-		// Ignore urls that don't match the path without
-		// logging an error. We don't care about these urls,
-		// and that's ok.
-		return nil
-	}
 
 	host, exist := data[gitHostKey]
 	if !exist {
