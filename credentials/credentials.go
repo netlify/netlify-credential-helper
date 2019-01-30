@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -19,6 +20,7 @@ const (
 	netlifyDefaultClientID      = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
 	netlifyAPIPath              = "/api/v1"
 	netlifyLargeMediaCapability = "large_media"
+	netlifyHost                 = ".netlify.com"
 
 	gitHostKey     = "host"
 	gitUsernameKey = "username"
@@ -66,7 +68,7 @@ func handleCommand(key string, in io.Reader, out io.Writer) error {
 	case "--version":
 		return printVersion(out)
 	}
-	return fmt.Errorf("Invalid Netlify Credential action `%s`", key)
+	return nil
 }
 
 // getCredentials retrieves the credentials for a given server url.
@@ -98,6 +100,11 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 	host, exist := data[gitHostKey]
 	if !exist {
 		return fmt.Errorf("Missing host to check credentials: %v", data)
+	}
+
+	if !strings.HasSuffix(host, netlifyHost) {
+		// ignore hosts that are not *.netlify.com
+		return nil
 	}
 
 	accessToken, err := getAccessToken(host)
