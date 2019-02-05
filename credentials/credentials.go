@@ -19,7 +19,7 @@ const (
 	netlifyAccessTokenUser      = "access-token"
 	netlifyDefaultClientID      = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
 	netlifyAPIPath              = "/api/v1"
-	netlifyLargeMediaCapability = "large_media"
+	netlifyLargeMediaCapability = "large_media_enabled"
 	netlifyHost                 = ".netlify.com"
 
 	gitHostKey     = "host"
