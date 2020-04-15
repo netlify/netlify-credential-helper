@@ -20,7 +20,8 @@ const (
 	netlifyDefaultClientID      = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
 	netlifyAPIPath              = "/api/v1"
 	netlifyLargeMediaCapability = "large_media_enabled"
-	netlifyHost                 = ".netlify.com"
+	netlifyHost                 = ".netlify.app"
+	netlifyAltHost              = ".netlify.com"
 
 	gitHostKey     = "host"
 	gitUsernameKey = "username"
@@ -102,8 +103,8 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 		return fmt.Errorf("Missing host to check credentials: %v", data)
 	}
 
-	if !strings.HasSuffix(host, netlifyHost) {
-		// ignore hosts that are not *.netlify.com
+	if !(strings.HasSuffix(host, netlifyHost) || strings.HasSuffix(host, netlifyAltHost)) {
+		// ignore hosts that are not *.netlify.app or *.netlify.com
 		return nil
 	}
 
