@@ -15,3 +15,5 @@ require (
 	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
 	go.opencensus.io v0.18.0 // indirect
 )
+
+go 1.13
