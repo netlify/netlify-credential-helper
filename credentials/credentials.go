@@ -15,13 +15,13 @@ import (
 const (
 	netlifyEnvAccessToken       = "NETLIFY_ACCESS_TOKEN"
 	netlifyEnvClientID          = "NETLIFY_CLIENT_ID"
-	netlifyServerName           = "https://api.netlify.com"
+	netlifyServerName           = "https://api.netlifystg.com"
 	netlifyAccessTokenUser      = "access-token"
 	netlifyDefaultClientID      = "5edad8f69d47ae8923d0cf0b4ab95ba1415e67492b5af26ad97f4709160bb31b"
 	netlifyAPIPath              = "/api/v1"
 	netlifyLargeMediaCapability = "large_media_enabled"
-	netlifyHost                 = ".netlify.app"
-	netlifyAltHost              = ".netlify.com"
+	netlifyHost                 = ".netlifystg.app"
+	netlifyAltHost              = ".netlifystg.com"
 
 	gitHostKey     = "host"
 	gitUsernameKey = "username"
@@ -104,7 +104,7 @@ func getCredentials(reader io.Reader, writer io.Writer) error {
 	}
 
 	if !(strings.HasSuffix(host, netlifyHost) || strings.HasSuffix(host, netlifyAltHost)) {
-		// ignore hosts that are not *.netlify.app or *.netlify.com
+		// ignore hosts that are not *.netlifystg.app or *.netlifystg.com
 		return nil
 	}
 

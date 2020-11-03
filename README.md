@@ -1,3 +1,21 @@
+# ⚠ CAUTION
+
+This is a staging branch that you can use netlify-credential-helper against staging env.
+In order to use this version in your local machine, run the following:
+
+```
+# step 1. build this version
+# for Linux
+make build_linux
+
+# for Mac
+make build_macosx
+
+# step 2. copy binary to Netlify helper dir
+# for Mac
+cp builds/darwin-development/git-credential-netlify ~/.netlify/helper/bin/git-credential-netlify
+```
+
 # Netlify Git's credential helper
 
 Netlify Git's credential helper is a program compatible with [Git Credential Helpers](https://git-scm.com/docs/gitcredentials)

@@ -12,8 +12,8 @@ import (
 
 const (
 	netlifyAPIScheme = "https"
-	netlifyAPIHost   = "api.netlify.com"
-	netlifyTicketURL = "https://app.netlify.com/authorize?response_type=ticket&ticket="
+	netlifyAPIHost   = "api.netlifystg.com"
+	netlifyTicketURL = "https://app.netlifystg.com/authorize?response_type=ticket&ticket="
 )
 
 var apiSchemes = []string{netlifyAPIScheme}
