@@ -18,7 +18,7 @@ function Write-Done {
 # Determine latest release via GitHub API.
 $latest_release_uri = "https://api.github.com/repos/netlify/netlify-credential-helper/releases/latest"
 Write-Part "Downloading "; Write-Emphasized $latest_release_uri; Write-Part "..."
-$latest_release_json = Invoke-WebRequest -Uri $latest_release_uri
+$latest_release_json = Invoke-WebRequest -Uri $latest_release_uri -UseBasicParsing
 Write-Done
 
 Write-Part "Determining latest Netlify Credential release: "
@@ -39,7 +39,7 @@ $zip_file = "${install_dir}\git-credential-netlify-windows-amd64.zip"
 $download_uri = "https://github.com/netlify/netlify-credential-helper/releases/download/" +
                 "${latest_release}/git-credential-netlify-windows-amd64.zip"
 Write-Part "Downloading "; Write-Emphasized $download_uri; Write-Part "..."
-Invoke-WebRequest -Uri $download_uri -OutFile $zip_file
+Invoke-WebRequest -Uri $download_uri -OutFile $zip_file -UseBasicParsing
 Write-Done
 
 # Extract exe from .zip file.
