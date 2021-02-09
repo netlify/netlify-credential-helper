@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	goruntime "runtime"
 
+	"github.com/adrg/xdg"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -32,21 +34,44 @@ type netlifyConfig struct {
 	Users       map[string]netlifyUserInfo `json:"users,omitempty"`
 }
 
-var validAuthPaths = [][]string{
-	{".netlify", "config.json"},
-	{".config", "netlify"},
-	{".netlify", "config"},
-	{".config", "netlify.json"},
+func getValidAuthPaths() ([][]string, error) {
+	home, err := homedir.Dir()
+	if err != nil {
+		return nil, err
+	}
+
+	var configPaths []string
+	if goruntime.GOOS == "windows" {
+		// on windows the go xdg lib behaves a bit different than the Node.js one
+		// https://github.com/sindresorhus/env-paths/blob/de22adb240117c7aacf0365187472907a9e06872/index.js#L28
+		// https://github.com/adrg/xdg/blob/af0f1bbdcb2e9415a67e57c4125afc9daeb3ca17/paths_windows.go#L40
+		appDataDir := os.Getenv("APPDATA")
+		if appDataDir == "" {
+			appDataDir = filepath.Join(home, "AppData", "Roaming")
+		}
+		configPaths = []string{appDataDir, "netlify", "Config", "config.json"}
+	} else {
+		configPaths = []string{xdg.ConfigHome, "netlify", "config.json"}
+	}
+
+	validAuthPaths := [][]string{
+		configPaths,
+		{home, ".netlify", "config.json"},
+		{home, ".config", "netlify"},
+		{home, ".netlify", "config"},
+		{home, ".config", "netlify.json"},
+	}
+
+	return validAuthPaths, nil
 }
 
 func saveAccessToken(token string) error {
-	home, err := homedir.Dir()
+	validAuthPaths, err := getValidAuthPaths()
 	if err != nil {
 		return err
 	}
 
-	args := append([]string{home}, validAuthPaths[0]...)
-	f, err := os.OpenFile(filepath.Join(args...), os.O_CREATE|os.O_RDWR, 0644)
+	f, err := os.OpenFile(filepath.Join(validAuthPaths[0]...), os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}
@@ -70,15 +95,17 @@ func loadAccessToken(host string) (string, error) {
 		return accessToken, nil
 	}
 
-	home, err := homedir.Dir()
+	return loadAccessTokenFromAuthPaths(host, tryAccessToken)
+}
+
+func loadAccessTokenFromAuthPaths(host string, checkHostAccess netlifyHostAccessCheck) (string, error) {
+	validAuthPaths, err := getValidAuthPaths()
 	if err != nil {
 		return "", err
 	}
-
 	var f *os.File
 	for _, p := range validAuthPaths {
-		args := append([]string{home}, p...)
-		f, err = os.Open(filepath.Join(args...))
+		f, err = os.Open(filepath.Join(p...))
 		if err == nil {
 			break
 		}
@@ -89,7 +116,7 @@ func loadAccessToken(host string) (string, error) {
 	}
 	defer f.Close()
 
-	return loadAccessTokenFromFile(f, host, tryAccessToken)
+	return loadAccessTokenFromFile(f, host, checkHostAccess)
 }
 
 func loadAccessTokenFromFile(f *os.File, host string, checkHostAccess netlifyHostAccessCheck) (string, error) {
