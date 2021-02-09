@@ -1,0 +1,32 @@
+name: Netlify Git's credential helper
+
+on:
+  # Ensure GitHub actions are not run twice for same commits
+  push:
+    branches: [master]
+    tags: ['*']
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-go:
+    name: Go ${{ matrix.go_version }} on ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        go_version: [1.14.x, 1.15.x]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Go ${{ matrix.go }}
+        uses: actions/setup-go@v2.1.3
+        with:
+          go-version: ${{ matrix.go_version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install make
+        run: choco install make
+        if: ${{ matrix.os == 'windows-latest' }}
+      - name: Install dependencies
+        run: make deps
+      - name: Tests
+        run: make test
