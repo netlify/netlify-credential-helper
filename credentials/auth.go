@@ -71,7 +71,15 @@ func saveAccessToken(token string) error {
 		return err
 	}
 
-	f, err := os.OpenFile(filepath.Join(validAuthPaths[0]...), os.O_CREATE|os.O_RDWR, 0644)
+	configPath := filepath.Join(validAuthPaths[0]...)
+
+	// make sure the directory structure exists
+	err = os.MkdirAll(filepath.Dir(configPath), 0644)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(configPath, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}
