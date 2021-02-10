@@ -74,12 +74,12 @@ func saveAccessToken(token string) error {
 	configPath := filepath.Join(validAuthPaths[0]...)
 
 	// make sure the directory structure exists
-	err = os.MkdirAll(filepath.Dir(configPath), 0644)
+	err = os.MkdirAll(filepath.Dir(configPath), 0700)
 	if err != nil {
 		return err
 	}
 
-	f, err := os.OpenFile(configPath, os.O_CREATE|os.O_RDWR, 0644)
+	f, err := os.OpenFile(configPath, os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
 		return err
 	}

@@ -80,10 +80,10 @@ func testLoadAccessTokenFromConfigDir(t *testing.T) {
 	input, err := ioutil.ReadFile(filepath.Join("_testdata", "netlify-node-cli.json"))
 	check(t, err)
 
-	err = os.MkdirAll(configPath, os.ModePerm)
+	err = os.MkdirAll(configPath, 0700)
 	check(t, err)
 
-	err = ioutil.WriteFile(filepath.Join(configPath, "config.json"), input, 0644)
+	err = ioutil.WriteFile(filepath.Join(configPath, "config.json"), input, 0600)
 	check(t, err)
 
 	token, err := loadAccessTokenFromAuthPaths("foobar.com", checkFakeHostAccess)
