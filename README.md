@@ -10,7 +10,7 @@ Our preferred way to install this software is by using Netlify CLI:
 1. Install Netlify CLI if you have not yet: `npm install -g netlify-cli`
 2. Run `netlify lm:install`.
 
-Netlify's Large Media plugin will download the latest version of this sofware 
+`netlify lm:install` command will download the latest version of this sofware 
 for your OS, and configure Git to use it when it's necessary. You don't need to
 do anything else.
 
