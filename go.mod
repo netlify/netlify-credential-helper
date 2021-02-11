@@ -3,6 +3,7 @@ module github.com/netlify/netlify-credential-helper
 require (
 	contrib.go.opencensus.io/exporter/ocagent v0.3.0 // indirect
 	github.com/Azure/go-autorest v11.2.8+incompatible // indirect
+	github.com/adrg/xdg v0.3.0
 	github.com/cenkalti/backoff v2.1.0+incompatible // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-openapi/runtime v0.17.2
