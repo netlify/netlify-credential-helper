@@ -98,7 +98,10 @@ Use `make deps` to install dependencies, `make test` to run tests, and `make bui
 
 ## Release
 
-Use `make release` to build all packages and create a release in GitHub Releases.
+1. Install `nfpm` [version v1.3.1](https://github.com/goreleaser/nfpm/releases/tag/v1.3.1)
+2. Install `hub` https://hub.github.com/
+3. Create a [GitHub personal access token](https://github.com/settings/tokens/new) and add it to your shell (e.g. `export GITHUB_TOKEN=<token>`)
+4. Use `make release` to build all packages and create a release in GitHub Releases.
 
 ## License
 
