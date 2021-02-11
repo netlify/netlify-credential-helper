@@ -5,11 +5,10 @@ that uses Netlify's API to authenticate a user.
 
 ## Install
 
-Our preferred way to install this software is by using Netlify's CLI plugins system:
+Our preferred way to install this software is by using Netlify's CLI:
 
 1. Install Netlify CLI if you have not yet: `npm install -g netlify-cli`
-2. Install [Netlify's Large Media](https://github.com/netlify/netlify-lm-plugin) plugin: `netlify plugins:install netlify-lm-plugin`
-3. Run the LM Setup: `netlify lm:setup`.
+2. Run the LM Setup: `netlify lm:install`.
 
 Netlify's Large Media plugin will download the latest version of this sofware 
 for your OS, and configure Git to use it when it's necessary. You don't need to
