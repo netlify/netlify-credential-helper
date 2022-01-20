@@ -39,4 +39,4 @@ release_installers: ## Release Homebrew and Scoop installers.
 
 release_upload: release_artifacts ## Upload release artifacts to GitHub.
 	@echo "Uploading release"
-	./build.sh build ${TAG}
+	./build.sh publish ${TAG}
