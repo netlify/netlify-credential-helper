@@ -86,7 +86,7 @@ function os_task {
     echo "Built: ${file}"
 
   # Publishing goes here
-  elif ["$CMD" == "package"]; then]
+  elif [ "$CMD" == "package" ]; then
     if [ "${os}" == "windows" ]; then
       dist="releases/${TAG}/${binary}-${os}-${arch}.zip"
     	zip -j "${dist}" "${file}"
@@ -119,6 +119,7 @@ function os_task {
       # append shasum to file
       sha256sum "${dist}" >> "releases/${TAG}/checksums.txt"
     fi
+  fi
 }
 
 
