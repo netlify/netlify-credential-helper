@@ -79,7 +79,7 @@ scoop install git-credential-netlify
 
 ### Manual install
 
-1. Download the relase binary specific for your OS from our [Releases]("https://github.com/netlify/netlify-credential-helper/releases").
+1. Download the release binary specific for your OS and CPU architecture from our [Releases]("https://github.com/netlify/netlify-credential-helper/releases").
 
 2. Extract the binary in your PATH.
 
@@ -93,14 +93,13 @@ store your authentication token for future usage so you don't have to login agai
 
 Go 1.11 or above is required to make changes in this program.
 
-Use `make deps` to install dependencies, `make test` to run tests, and `make build` to build the binary.
+Use `make deps` to install dependencies, `make test` to run tests, and `make build` to build the binaries.
 
 ## Release
 
-1. Install `nfpm` [version v1.3.1](https://github.com/goreleaser/nfpm/releases/tag/v1.3.1)
-2. Install `hub` https://hub.github.com/
-3. Create a [GitHub personal access token](https://github.com/settings/tokens/new) and add it to your shell (e.g. `export GITHUB_TOKEN=<token>`)
-4. Use `make release TAG=0.1.X` to build all packages and create a release in GitHub Releases.
+1. Install `hub` https://hub.github.com/
+2. Create a [GitHub personal access token](https://github.com/settings/tokens/new) and add it to your shell (e.g. `export GITHUB_TOKEN=<token>`)
+3. Use `make release TAG=0.1.X` to build all packages and create a release in GitHub Releases.
 
 ## License
 
