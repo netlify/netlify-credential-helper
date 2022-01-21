@@ -45,14 +45,14 @@ if [ "${CMD}" == "package" ];then
 
 # Run the actual publishing command
 elif [ "$CMD" == "publish" ]; then
-  args=""
+  args=()
 
   for artifact in "releases/${TAG}"/*; do
-    echo " -a ${artifact}"
-    args="${args} -a ${artifact}"
+
+    args+=("-a" "${artifact}")
   done
   
-  hub release create "${args}" "v${TAG}"
+  hub release create "${args[@]}" "v${TAG}"
   exit 0
 fi
 
