@@ -1,6 +1,7 @@
 package credentials
 
 import (
+	"errors"
 	"os"
 
 	"github.com/go-openapi/runtime"
@@ -21,7 +22,7 @@ var apiSchemes = []string{netlifyAPIScheme}
 func login(clientID, host string) (string, error) {
 	if !isTTY() {
 		// do not try to login when the standard input is not a TTY.
-		return "", nil
+		return "", errors.New(`Unable to login. Not running in a TTY. Please login via "netlify login"`)
 	}
 
 	client, ctx := newNetlifyAPIClient(noCredentials)
